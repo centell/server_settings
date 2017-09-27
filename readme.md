@@ -1,1 +1,1 @@
-Git cloned test
+Git pull test
