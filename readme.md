@@ -1,7 +1,7 @@
 Web server on Ubuntu 16.04 LTS
 ======================
 
-Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 메뉴얼입니다. 이 문서에서는 Nginx와 php를 연동시키고, Tomcat과 Java를 연동시키고, node.js까지 설치해 봅니다. Tomcat과 Nginx의 포트도 변경합니다. 또한 git 저장소도 생성해봅니다. 이 가이드에서 필요한 것만 골라서 사용하십시오.
+Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 메뉴얼입니다. 이 문서에서는 Nginx와 php를 연동시키고, Tomcat과 Java를 연동시키고, node.js까지 설치해 봅니다. Tomcat과 Nginx의 포트도 변경합니다. DB는 MaridDB를 설치합니다. 또한 git 저장소도 생성해봅니다. 이 가이드에서 필요한 것만 골라서 사용하십시오.
 
 이 문서는 AWS를 이용하든 vagrant를 이용하든 Ubuntu 16.04 LTS 를 사용할 환경을 갖춘 이후를 다룬 가이드입니다. 기본적인 리눅스 명령어에 대한 설명는 제타위키 등에서 검색하시면 찾을 수 있습니다.
 
@@ -136,4 +136,45 @@ nginx는 기본적으로 80 포트를 사용합니다. 웹브라우저를 켜고
 
 ![nginx success](/img/3-4.png)
 
+# 4. MariaDB 설치
+DB는 MariaDB를 설치합니다.
 
+## 4-1. 저장소 추가
+MariaDB의 최신 버전을 설치하기 위해 저장소를 등록합니다. [여기](https://mariadb.com/kb/en/library/installing-mariadb-deb-files/)에서 MariaDB 저장소를 등록하는 방법을 배울 수 있습니다.
+
+### 4-1-1. 저장소 보안키 등록
+```
+# apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+```
+
+### 4-1-2. 저장소 경로 추가
+nginx 를 등록할 때와 마찬가지로 `apt/source.list` 에 저장소의 경로를 추가합니다.
+```
+# vi /etc/apt/sources.list
+```
+
+`apt/sources.list`의 최하단에 아래 코드를 삽입합니다.
+```
+# MariaDB
+deb http://ftp.kaist.ac.kr/mariadb/repo/10.1/ubuntu xenial main
+
+```
+![MariaDB](/img/4-1.png)
+
+## 4-2. 저장소 적용 및 설치
+이제 MariaDB를 설치합니다. 시간이 다소 소요됩니다. 여기서는 10.1버전을 설치합니다.
+```
+# apt-get update
+# apt-get install mariadb-server-10.1 mariadb-client-10.1
+```
+
+설치시에 데이터베이스 root 사용자의 비밀번호를 설정합니다. 설치와 동시에 MariaDB 가 실행되며, 재부팅시에도 자동 시작되도록 설정됩니다.
+![MariaDB](/img/4-2.png)
+
+설치가 잘 되었는지 확인하기 위해 서비스 상태를 확인해봅니다.
+```
+# service mysql status 
+```
+![MariaDB](/img/4-3.png)
+
+초록색 active (running)이 확인되면 모든 것이 정상입니다. 표시할 정보가 많으면 more 가 나올 수도 있습니다. Q 나 Control+C 를 입력하여 터미널로 돌아올 수 있습니다.
