@@ -56,19 +56,21 @@ vi /etc/hostname
 ```
 127.0.0.1   myserver
 ```
+![hostname](/img/2-1.png)
 
 이제 변경한 내용을 적용합니다. 아래 명령어를 입력한 뒤, 서버에 재 접속하면 설정이 적용되어 `ubuntu@myserver`등으로 변경 된 것을 확인할 수 있습니다.
 ```
 # hostname -F /etc/hostname
 ```
+![hostname](/img/2-3.png)
 
 # 3. Nginx 웹 서버 설치하기
 이제 본격적으로 웹서비스를 준비합니다. 그냥 `apt-get install nginx`라고 명령해도 설치가 되긴 합니다만, 공식 저장소는 최신화 되어 있지 않은 경우가 많아 옛 버전이 설치됩니다. 최신 버전을 사용하려면 최신버전의 저장소를 `apt-get` 패키지에 등록해야 합니다.
 
-## 3-1 저장소 등록
+## 3-1. 저장소 등록
 nginx 최신 버전의 저장소를 apt-get패키지에 추가합니다. 등록 방법은 [여기](http://nginx.org/en/linux_packages.html)에서 배울 수 있습니다.
 
-### 3-1-1 저장소 보안키 등록
+### 3-1-1. 저장소 보안키 등록
 저장소를 등록하기 위한 첫 번째 절차입니다.
 ```
 # cd /root -- root 디렉토리로 이동
@@ -76,8 +78,9 @@ nginx 최신 버전의 저장소를 apt-get패키지에 추가합니다. 등록 
 # apt-key add nginx_signing.key -- 다운 받은 키를 서버에 등록
 # rm nginx_signing.key -- 등록 완료 후 필요 없어진 파일 삭제
 ```
+![nginx key](/img/3-1.png)
 
-### 3-1-2 저장소 경로 추가
+### 3-1-2. 저장소 경로 추가
 저장소를 등록하기 위한 두 번째 절차입니다. `apt/source.list` 에 저장소의 경로를 추가합니다.
 ```
 # vi /etc/apt/sources.list
@@ -89,6 +92,8 @@ nginx 최신 버전의 저장소를 apt-get패키지에 추가합니다. 등록 
 deb http://nginx.org/packages/mainline/ubuntu/ xenial nginx
 deb-src http://nginx.org/packages/mainline/ubuntu/ xenial nginx
 ```
+![nginx rep](/img/3-2.png)
+
 이때, `xenial`은 `Codename`으로, ubuntu의 버전과 관계있습니다. [여기](http://nginx.org/en/linux_packages.html)에서 `Codename`을 확인할 수 있습니다. Ubuntu 16.04 외의 버전을 사용하신다면 해당 값을 변경하십시오.
 ```
 Debian:
@@ -107,7 +112,7 @@ Version     Codename     Supported Platforms
 16.10     yakkety     x86_64, i386
 ```
 
-## 3-2 저장소 적용 및 설치
+## 3-2. 저장소 적용 및 설치
 
 이제 바뀐 내용을 적용하기 위해 업데이트 합니다.
 ```
@@ -120,6 +125,7 @@ apt-get update
 ```
 # nginx -v
 ```
+![nginx version](/img/3-3.png)
 
 서버 재시작도 잘 되는지 체크해봅시다.
 ```
@@ -128,5 +134,6 @@ apt-get update
 
 nginx는 기본적으로 80 포트를 사용합니다. 웹브라우저를 켜고 서버의 아이피(http://111.222.333.444 등)에 접속해서 동작 여부를 확인합니다. Welcome to nginx! 문구가 뜨면 정상입니다. `apt-get`으로 설치하였을 때, 이 파일의 기본 위치는 `/usr/share/nginx/html/index.html` 입니다.
 
-![nginx 첫 화면](/img/3-4.png)
+![nginx success](/img/3-4.png)
+
 
