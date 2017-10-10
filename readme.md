@@ -8,17 +8,17 @@ Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 �
 
 `$ whoami` -- 사용자 확인하기
 
-AWS 의 경우 유저 이름이 ubuntu,  Homestead vagrant를 사용했을 경우 vagrant 등으로 나타날 것입니다.
-`$ sudo su` -- 관리자 권한 얻기
+AWS 의 경우 유저 이름이 ubuntu,  Homestead vagrant를 사용했을 경우 vagrant 등으로 나타날 것입니다. ..
+`$ sudo su` -- 관리자 권한 얻기..
 
-이제 관리자(root) 권한을 얻어 $가 #으로 변경된것을 볼 수 있습니다.
+이제 관리자(root) 권한을 얻어 $가 #으로 변경된것을 볼 수 있습니다. ..
 
-Change Password - 보안을 위해 ubuntu와 root의 비밀번호를 지정해줍니다. (연습중에는 성가실 뿐이니 생략해도 괜찮습니다.)
-`# passwd ubuntu` -- 유저 비밀번호 변경
-`# passwd root` -- 루트 비밀번호 변경
+Change Password - 보안을 위해 ubuntu와 root의 비밀번호를 지정해줍니다. (연습중에는 성가실 뿐이니 생략해도 괜찮습니다.)..
+`# passwd ubuntu` -- 유저 비밀번호 변경..
+`# passwd root` -- 루트 비밀번호 변경..
 
-Update system package - 리눅스든 윈도우든, 어떤 OS이든 처음 사용할 땐 업데이트를 합니다.
-`# apt-get update` -- 패키지 목록 갱신
-`# apt-get upgrade` -- 현재 운영체제에 설치되어 있는 프로그램 최신버전패치
+Update system package - 리눅스든 윈도우든, 어떤 OS이든 처음 사용할 땐 업데이트를 합니다. ..
+`# apt-get update` -- 패키지 목록 갱신..
+`# apt-get upgrade` -- 현재 운영체제에 설치되어 있는 프로그램 최신버전패치..
 
 
