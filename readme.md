@@ -107,7 +107,7 @@ Version     Codename     Supported Platforms
 16.10     yakkety     x86_64, i386
 ```
 
-### 3-1-3 저장소 적용 및 설치
+## 3-2 저장소 적용 및 설치
 
 이제 바뀐 내용을 적용하기 위해 업데이트 합니다.
 ```
