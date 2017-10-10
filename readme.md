@@ -157,7 +157,6 @@ nginx 를 등록할 때와 마찬가지로 `apt/source.list` 에 저장소의 �
 ```
 # MariaDB
 deb http://ftp.kaist.ac.kr/mariadb/repo/10.1/ubuntu xenial main
-
 ```
 ![MariaDB](/img/4-1.png)
 
