@@ -306,7 +306,7 @@ service nginx restart
 ### 5-4-2. Nginx 에서 PHP 확장자를 갖는 파일에 대한 처리를 PHP-FPM에게 요청하도록 설정
 
 nginx.conf 의 서버 설정 파일을 추가합니다. 확장자면 conf 이면 파일 이름은 상관 없습니다.
-`/etc/nginx/conf.d/` 디렉토리에 있는 확장자를 conf로 갖는 `*.conf` 파일은 `/etc/nginx/nginx.conf` 에 include됩니다.
+`/etc/nginx/conf.d/` 디렉토리에 있는 확장자를 conf로 갖는 `*.conf` 파일은 `/etc/nginx/nginx.conf` 에 include됩니다.  
 우선, 혹시 생길 문제를 대비하여 디폴트 세팅을 저장해둡시다. default.conf 는 디폴트 서버 설정이 포함되어 있습니다.
 
 ```shell
@@ -395,7 +395,7 @@ phpinfo();
 
 ![php](/img/5-5.png)
 
-제대로 안 되면 php가 실행되지 않고 다운로드됩니다. 설정값이 잘못되었거나, server nginx restart 명령을 안 내렸을 가능성이 높습니다.
-file not found가 나타난다면 *.conf 값의 root 경로설정이 잘못 되었을 가능성이 높습니다.
+제대로 안 되면 php가 실행되지 않고 다운로드됩니다. 설정값이 잘못되었거나, `server nginx restart` 명령을 안 내렸을 가능성이 높습니다.
+file not found가 나타난다면 `*.conf` 값의 root 경로설정이 잘못 되었을 가능성이 높습니다.
 
 ![php](/img/5-6.png)
