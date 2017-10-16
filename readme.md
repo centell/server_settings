@@ -33,9 +33,9 @@ Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 �
         5-4-1. nginx 사용자 권한 변경
         5-4-2. Nginx 에서 PHP 확장자를 갖는 파일에 대한 처리를 PHP-FPM에게 요청하도록 설정
         5-4-3. nginx - php 연동 테스트
-    5-5. phpMyAdmin 설치(작성중)
-(이하 작성 예정)
+    5-5. phpMyAdmin 설치
 6. Java 및 Tomcat 설치하기
+(이하 작성 예정)
 7. node.js 설치하기
 8. Git 설치하기
 ```
@@ -468,6 +468,79 @@ file not found가 나타난다면 `*.conf` 값의 root 경로설정이 잘못 �
 
 ![php](/img/5-6.png)
 
+## 5-5. phpMyAdmin 설치
+phpMyAdmin 은 mysql(mariaDB)의 관리를 도와주는 툴 입니다. zip(압축) 해제 프로그램을 설치합니다.
+```shell
+apt-get install unzip
+```
+
+nginx의 메인 디렉터리로 이동합니다.
+```shell
+cd /usr/share/nginx/html
+```
+
+[phpMyAdmin공식 홈페이지](https://www.phpmyadmin.net)에서 최신 버전의 phpMyAdmin의 다운로드 주소를 복사하여 wget 로 다운받습니다.
+```shell
+wget https://files.phpmyadmin.net/phpMyAdmin/4.7.4/phpMyAdmin-4.7.4-all-languages.zip
+```
+
+압축을 풀어주고, 접근하기 쉽게 이름을 변경해줍니다. 그 후 다운 받았던 압축 파일은 삭제해주겠습니다.
+```shell
+unzip phpMyAdmin-4.7.4-all-languages.zip
+mv phpMyAdmin-4.7.4-all-languages phpmyadmin
+rm phpMyAdmin-4.7.4-all-languages.zip
+```
+
+이제 도메인/phpmyadmin (예:http://111.222.333.444/phpmyadmin)으로 접속하면 사용할 수 있습니다. 기본적으로는 루트에 설치된 mysql(mariadb)에 접속됩니다.
+
+이제 php 관련 설치가 끝났습니다. 재부팅을 한 번 해줍시다.
+```shell
+reboot
+```
+
+재부팅 후에 phpinfo 페이지와 phpmyadmin 가 잘 실행된다면 “재부팅이 가능한 서버” 라고 볼 수 있습니다
+
+(옵션) phpMyAdmin을 RDS에 연결하기
+phpMyAdmin이 다른 서버의 DB를 수정할 수 있도록 하는 옵션입니다. phpmyadmin 폴더 안의 `config.inc.php`를 수정합니다.
+
+```shell
+cp config.sample.inc.php config.inc.php -- config.inc.php 파일 복제 (이미 있다면 넘어가셔도 됩니다.)
+vi /usr/share/nginx/html/phpmyadmin/config.inc.php
+```
+
+여기서, `config.inc.php` 안의
+```shell
+/**
+ * End of servers configuration
+ */
+```
+
+위에 자신의 환경에 맞게 수정한 뒤 붙여넣습니다.
+
+```shell
+…
+
+$i++;
+$cfg['Servers'][$i]['host'] = '____your_DB_address(Endpoint)____';
+$cfg['Servers'][$i]['port'] = '3306';
+$cfg['Servers'][$i]['socket'] = '';
+$cfg['Servers'][$i]['connect_type'] = 'tcp';
+$cfg['Servers'][$i]['extension'] = 'mysql';
+$cfg['Servers'][$i]['compress'] = TRUE;
+$cfg['Servers'][$i]['auth_type'] = 'config';
+$cfg['Servers'][$i]['user'] = '____your_user_id____';
+$cfg['Servers'][$i]['password'] = '____your_password____';
+
+
+/**
+ * End of servers configuration
+ */
+
+…
+```
+
+이제 phpMyAdmin을 이용해서 원격DB 접속이 가능합니다.
+![phpMyAdmin](/img/5-7.png)
 
 # 6. Java 및 Tomcat 설치하기
 Spring 등으로 작성된 웹 어플리케이션을 실행하기 위해선 Java와 Tomcat이 필요하죠. 이를 설치해봅니다.
