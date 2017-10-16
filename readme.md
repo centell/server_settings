@@ -291,7 +291,7 @@ apt-get install php7.1 php7.1-common
 
 이제 필요에 따라 추가 패키지를 설치합니다.
 ```shell
-apt-get php7.1-cli php7.1-sqlite3 php7.1-gd php7.1-json php7.1-curl php7.1-mysql php7.1-readline php7.1-mbstring php7.1-xml php7.1-zip php7.1-intl
+apt-get install php7.1-cli php7.1-sqlite3 php7.1-gd php7.1-json php7.1-curl php7.1-mysql php7.1-readline php7.1-mbstring php7.1-xml php7.1-zip php7.1-intl
 ```
 
 잘 설치되었는지 확인하기 위해 `php -v` 명령으로 버전을 확인합니다.
