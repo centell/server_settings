@@ -34,7 +34,14 @@ Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 �
         5-4-2. Nginx 에서 PHP 확장자를 갖는 파일에 대한 처리를 PHP-FPM에게 요청하도록 설정
         5-4-3. nginx - php 연동 테스트
     5-5. phpMyAdmin 설치
+        5-5-1. [옵션]phpMyAdmin을 RDS에 연결하기
 6. Java 및 Tomcat 설치하기
+    6-1. Java 설치하기
+        6-1-1. JRE, JDK설치
+        6-1-2. Java Home 환경 설정
+    6-2. Tomcat 설치하기(8.5)
+    6-3. Apache Tomcat 테스트
+
 (이하 작성 예정)
 7. node.js 설치하기
 8. Git 설치하기
@@ -500,7 +507,7 @@ reboot
 
 재부팅 후에 phpinfo 페이지와 phpmyadmin 가 잘 실행된다면 “재부팅이 가능한 서버” 라고 볼 수 있습니다
 
-(옵션) phpMyAdmin을 RDS에 연결하기
+### 5-5-1. [옵션]phpMyAdmin을 RDS에 연결하기
 phpMyAdmin이 다른 서버의 DB를 수정할 수 있도록 하는 옵션입니다. phpmyadmin 폴더 안의 `config.inc.php`를 수정합니다.
 
 ```shell
@@ -540,6 +547,7 @@ $cfg['Servers'][$i]['password'] = '____your_password____';
 ```
 
 이제 phpMyAdmin을 이용해서 원격DB 접속이 가능합니다.
+
 ![phpMyAdmin](/img/5-7.png)
 
 # 6. Java 및 Tomcat 설치하기
@@ -572,7 +580,7 @@ apt-get install oracle-java8-installer -y
 ```shell
 java -version
 ```
-### 6-1-2. Configure Java Home Environment
+### 6-1-2. Java Home 환경 설정
 첫 번째 단계에서는 Java를 설치했습니다. 이제 Java 응용 프로그램이 Java 설치 디렉토리를 찾을 수 있도록 Ubuntu 서버에서 JAVA_HOME 환경 변수를 구성해야 합니다. Tomcat은 제대로 설정하려면 JAVA_HOME 환경이 필요합니다. JAVA_HOME 환경을 설정하기 전에 Java 디렉토리의 위치를 ​​알아야합니다. 아래 명령을 사용하여 Java 디렉토리의 위치를 ​​확인하십시오.
 
 ```shell
@@ -657,7 +665,7 @@ CATALINA_HOME환경을 확인합니다.
 echo $CATALINA_HOME
 ```
 
-### 6-3. Test Apache Tomcat
+### 6-3. Apache Tomcat 테스트
 이제 모든것이 잘 되었는지 확인합니다.
 ```shell
 CATALINA_HOME/bin/startup.sh
@@ -672,7 +680,7 @@ netstat -plntu
 ![Tomcat](/img/6-5.png)
 
 
-( 옵션 ) 톰켓의 포트 번호 변경
+(옵션) 톰켓의 포트 번호 변경
 톰켓 디렉토리에서 `tomcat/conf/server.xml` 에서 포트를 변경할 수 있습니다. `/8080` 으로 검색해서 기본으로 설정된 `8080` 포트를 찾아 `80`등 원하는 포트로 수정합시다.
 
 ```shell
