@@ -319,11 +319,6 @@ date.timezone = Asia/Seoul
 ```
 ![php](/img/5-2.png)
 
-이때, 메모리가 기본 128M인데 자신의 서버 용량에 맞게 넉넉하게 설정합시다.
-```shell
-memory_limit = 512M
-```
-
 변경사항을 적용하기 위해 php service를 재시작합니다.
 ```shell
 service php7.1-fpm restart
