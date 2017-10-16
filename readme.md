@@ -12,6 +12,7 @@ Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 �
 2. 시스템 설정
     2-1. 시스템 시간 설정 (권장)
     2-2. Hostname 변경 (옵션)
+    2-3. SSH및 FTP Root접속 권한 설정 (옵션)
 3. Nginx 웹 서버 설치하기
     3-1. 저장소 등록
         3-1-1. 저장소 보안키 등록
@@ -103,7 +104,6 @@ vi /etc/hosts
 ```shell
 127.0.0.1   myserver
 ```
-![hostname](/img/2-0-3.png)
 ![hostname](/img/2-0-4.png)
 
 이제 변경한 내용을 적용합니다. 아래 명령어를 입력한 뒤, 서버에 재 접속하면 설정이 적용되어 `ubuntu@myserver`등으로 변경 된 것을 확인할 수 있습니다.
@@ -112,6 +112,27 @@ hostname -F /etc/hostname
 ```
 ![hostname](/img/2-3.png)
 
+### 2-3. SSH및 FTP Root접속 권한 설정 (옵션)
+AWS의 경우, 처음 EC2를 생성하면 ssh및 ftp접속 권한이 ubuntu 유저로만 활성화되어 있고 root 계정 접속 허가는 비활성화 되어 있습니다. 물론 ssh접속을 하면 ubuntu 유저는 sudo 명령을 이용해서 root 권한을 사용할 수 있지만, FTP를 이용할 땐 권한을 얻기 힘들어 불편한 점이 있습니다. `/home/ubuntu` 디렉토리 외에는 FTP를 통해 파일을 추가/삭제/수정할 권한이 없어서 작업시에 불편할 수 있습니다.
+
+root 권한이나 sudo 명령어를 통해서 sshd_config파일을 vi편집기로 수정합시다.
+```shell
+vi /etc/ssh/sshd_config
+```
+
+`PermitRootLogin` 를 찾아서 yes로 변경해줍니다. 편집기에서 i 를 누르면 insert모드로 들어가 수정이 가능해지고, esc를 누른 뒤 :wq 를 입력하면 저장후 터미널로 돌아옵니다. ( :q 는 나가기, :q! 는 강제로 나가기 입니다. q!의 경우 sudo 권한 없이 수정을 시도했다가 권한이 없어 저장할 수 없을 때 편집을 무시하고 터미널로 돌아갈 때 사용됩니다.) 기존의 `PermitRootLogin` 항목은 주석으로 처리하거나(#을 앞에 써주면 됨) 지워버립시다.
+
+![setting](/image/2-5.png)
+
+이제 ubuntu 유저의 ssh key를 루트에 복사해줍니다. `/root/.ssh` 디렉토리가 없다면 `mkdir /root/.ssh` 로 생성해줍니다.
+
+```shell
+cp /home/ubuntu/.ssh/authorized_keys /root/.ssh/
+```
+
+이제 외부에서 ssh및 ftp를 root 계정으로 원격 접속 할 수 있습니다.
+![setting](/image/2-6.png)
+
 # 3. Nginx 웹 서버 설치하기
 이제 본격적으로 웹서비스를 준비합니다. 그냥 `apt-get install nginx`라고 명령해도 설치가 되긴 합니다만, 공식 저장소는 최신화 되어 있지 않은 경우가 많아 옛 버전이 설치됩니다. 최신 버전을 사용하려면 최신버전의 저장소를 `apt-get` 패키지에 등록해야 합니다.
 
@@ -119,7 +140,7 @@ hostname -F /etc/hostname
 nginx 최신 버전의 저장소를 apt-get패키지에 추가합니다. 등록 방법은 [여기](http://nginx.org/en/linux_packages.html)에서 배울 수 있습니다.
 
 ### 3-1-1. 저장소 보안키 등록
-저장소를 등록하기 위한 첫 번째 절차입니다.
+저장소를 등록하기 위한 첫 번째 절차입니다. `root`로 이동하기 위해선 권한을 획등해야 합니다. (`sudo su`)
 ```shell
 cd /root -- root 디렉토리로 이동
 wget http://nginx.org/keys/nginx_signing.key -- 인증키 다운로드
@@ -188,6 +209,9 @@ service nginx restart
 nginx는 기본적으로 80 포트를 사용합니다. 웹브라우저를 켜고 서버의 아이피(http://111.222.333.444 등)에 접속해서 동작 여부를 확인합니다. Welcome to nginx! 문구가 뜨면 정상입니다. `apt-get`으로 설치하였을 때, 이 파일의 기본 위치는 `/usr/share/nginx/html/index.html` 입니다.
 
 ![nginx success](/img/3-4.png)
+
+[trouble shooting]
+1) "응답하는 데 시간이 너무 오래 걸립니다." 라며 페이지가 접속되지 않을 때는 포트가 열려있는지 먼저 확인해보세요. nginx의 default port는 80입니다. AWS의 경우, Security group 의 초깃값이 22번 포트만 열려 있습니다. 여기서 80포트를 열면 문제가 해결될 수 있습니다.
 
 # 4. MariaDB 설치
 DB는 MariaDB를 설치합니다.
@@ -448,3 +472,147 @@ phpinfo();
 file not found가 나타난다면 `*.conf` 값의 root 경로설정이 잘못 되었을 가능성이 높습니다.
 
 ![php](/img/5-6.png)
+
+
+# 6. Java 및 Tomcat 설치하기
+Spring 등으로 작성된 웹 어플리케이션을 실행하기 위해선 Java와 Tomcat이 필요하죠. 이를 설치해봅니다.
+
+## 6-1. Java 설치하기
+### 6-1-1. JRE, JDK설치
+이 단계에서는 Ubuntu PPA 저장소에서 Java JRE 및 JDK를 설치합니다. 먼저 저장소 관리를 위한 패키지인 `python-software-properties`를 설치해야 합니다. 여기서는 Java 1.8을 설치합니다.
+
+```shell
+apt-get install python-software-properties -y
+```
+
+패키지가 설치되면 새로운 PPA java 저장소를 추가하고 `apt-get update`를 실행합니다. 저장소를 추가할 때 `Enter`를 요구하는데, 요구대로 해줍시다.
+```shell
+add-apt-repository ppa:webupd8team/java
+apt-get update
+```
+
+apt를 사용하여 PPA 저장소에서 Java JRE 및 JDK를 설치합니다. Oracle의 약관에 동의하시면 설치가 진행됩니다.
+```shell
+apt-get install oracle-java8-installer -y
+```
+
+설치 과정에서 Oracle사의 라이센스 정책 동의 여부를 물어봅니다.
+![java](/img/6-1.png)
+![java](/img/6-2.png)
+
+설치가 완료되면 버전 체크를 하여 제대로 설치되었는지 확인합니다.
+```shell
+java -version
+```
+### 6-1-2. Configure Java Home Environment
+첫 번째 단계에서는 Java를 설치했습니다. 이제 Java 응용 프로그램이 Java 설치 디렉토리를 찾을 수 있도록 Ubuntu 서버에서 JAVA_HOME 환경 변수를 구성해야 합니다. Tomcat은 제대로 설정하려면 JAVA_HOME 환경이 필요합니다. JAVA_HOME 환경을 설정하기 전에 Java 디렉토리의 위치를 ​​알아야합니다. 아래 명령을 사용하여 Java 디렉토리의 위치를 ​​확인하십시오.
+
+```shell
+update-alternatives --config java
+```
+
+그럼 이제 vi나 vim 으로 `environment` 파일을 수정하여 환경 설정을 합시다. 최하단에 다음 내용을 써주세요.
+```shell
+vi /etc/environment
+```
+
+```shell
+JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre"
+```
+![java](/img/6-3.png)
+
+다음으론 `.bashrc` 를 수정합니다. 마찬가지로 최하단에 다음 내용을 써주세요.
+```shell
+vi ~/.bashrc
+```
+
+```shell
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+저장한 뒤, `.bashrc`를 재시작 합니다.
+```shell
+source ~/.bashrc
+```
+
+작업에 문제가 없을을 확인합니다.
+```shell
+echo $JAVA_HOME
+```
+
+## 6-2. Tomcat 설치하기(8.5)
+이제 본격적으로 Tomcat을 설치합니다. 먼저 Tomcat 유저 및 그룹을 생성합니다.
+```shell
+groupadd tomcat
+useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+```
+
+다음으로, 원하는 위치로 가서 톰켓을 다운받습니다. 여기서는 /opt 로 이동합니다. 원하는 버전의 다운로드 링크를 톰켓 [공식홈페이지](http://tomcat.apache.org/)에 가서 확인합니다. 여기서는 8.5 버전을 사용합니다.
+
+```shell
+cd /opt/
+wget http://apache.tt.co.kr/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
+```
+
+압축을 풀고 이름을 변경해 줍니다.
+
+```shell
+tar -xzvf apache-tomcat-8.5.20.tar.gz
+mv apache-tomcat-8.5.20 tomcat
+```
+
+tomcat 디렉토리의 소유자를 tomcat 사용자로 변경하고 bin 디렉토리의 모든 파일을 실행 가능하게 만듭니다.
+```shell
+chown -hR tomcat:tomcat tomcat
+chmod +x /opt/tomcat/bin/*
+```
+
+다음에는 Apache Tomcat으로 테스트를 실행할 수 있도록 CATALINA_HOME 디렉토리를 정의해야 합니다. Catalina는 Tomcat 서블릿 컨테이너입니다. vim으로 .bashrc 파일을 편집합니다.
+
+```shell
+vi ~/.bashrc
+```
+
+최하단에 다음을 추가합니다.
+```shell
+export CATALINA_HOME=/opt/tomcat
+```
+
+저장하고, `.bashrc` 를 다시 실행합니다.
+```shell
+source ~/.bashrc
+```
+
+CATALINA_HOME환경을 확인합니다.
+```shell
+echo $CATALINA_HOME
+```
+
+### 6-3. Test Apache Tomcat
+이제 모든것이 잘 되었는지 확인합니다.
+```shell
+CATALINA_HOME/bin/startup.sh
+```
+
+Tomcat started 라는 문구를 확인할 수 있으면 제대로 실행 된 것입니다. 다음 명령어를 통해 포트가 제대로 열렸는지 확인합시다. Tomcat은 기본적으로 8080 포트를 사용합니다.
+```shell
+netstat -plntu
+```
+
+모든것이 잘 돌아간다면 이 고양이를 확인할 수 있을 겁니다.
+![Tomcat](/img/6-5.png)
+
+
+( 옵션 ) 톰켓의 포트 번호 변경
+톰켓 디렉토리에서 `tomcat/conf/server.xml` 에서 포트를 변경할 수 있습니다. `/8080` 으로 검색해서 기본으로 설정된 `8080` 포트를 찾아 `80`등 원하는 포트로 수정합시다.
+
+```shell
+vi /opt/tomcat/conf/server.xml
+```
+
+그리고 톰켓을 재시작하면 적용됩니다. `cd tomcat/bin/` 이동하면 tomcat 실행 파일이 존재하고, 해당 파일을 실행해서 엔진을 켜고 끌 수 있습니다.
+
+tomcat 엔진 중지 `./shutdown.sh`
+tomcat 엔진 시작 `./startup.sh`
+tomcat 재시작 `systemctl restart tomcat`
