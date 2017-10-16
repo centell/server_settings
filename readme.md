@@ -614,5 +614,7 @@ vi /opt/tomcat/conf/server.xml
 그리고 톰켓을 재시작하면 적용됩니다. `cd tomcat/bin/` 이동하면 tomcat 실행 파일이 존재하고, 해당 파일을 실행해서 엔진을 켜고 끌 수 있습니다.
 
 tomcat 엔진 중지 `./shutdown.sh`
+
 tomcat 엔진 시작 `./startup.sh`
+
 tomcat 재시작 `systemctl restart tomcat`
