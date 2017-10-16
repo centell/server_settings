@@ -69,6 +69,10 @@ sudo apt-get update -- 패키지 목록 갱신
 sudo apt-get upgrade -- 현재 운영체제에 설치되어 있는 프로그램을 최신 버전으로 패치
 ```
 
+`apt-get upgrade` 를 진행할 때 선택지가 나타나는데, `Keep the local version currently installed`를 선택합니다.
+
+![upgrade](/img/1-1.png)
+
 # 2. 시스템 설정
 
 기본적인 시스템 설정을 합니다. 앞으로 root 권한을 가지고 한다는 가정하에 `sudo`명령을 생략하고 진행합니다.
@@ -79,6 +83,11 @@ dpkg-reconfigure tzdata
 ```
 이후 나타나는 GUI 설정에서 Asia, Seoul 을 차례로 선택합니다.
 
+![tzdata](/img/2-0-1.png)
+
+![tzdata](/img/2-0-2.png)
+
+
 ## 2-2. Hostname  변경 (옵션)
 
 hostname 파일에는 서버의 이름이 기록되어 있습니다. 이를 이름을 원하는 이름으로 변경합니다. ( 수정하기 위해 키보드의 `i`를 눌러 insert 모드로 들어갑니다.  `esc`를 누르면 모드를 나갈 수 있습니다. `:wq` 를 입력한 후 `enter(혹은 return)`을 입력하면 저장 후 나가기가 됩니다.  vi의 자세한 사용법은 다른 문서를 찾아보십시오.)
@@ -86,11 +95,16 @@ hostname 파일에는 서버의 이름이 기록되어 있습니다. 이를 이�
 vi /etc/hostname
 ```
 
-또한 변경한 이름을 hosts에 등록해야 합니다. 예컨대 `myserver`라고 이름지었다면, `127.0.0.1 localhost` 아래에 `myserver`를 등록합니다.
+또한 변경한 이름을 `hosts`에 등록해야 합니다. 예컨대 `myserver`라고 이름지었다면, `127.0.0.1 localhost` 아래에 `myserver`를 등록합니다.
+```shell
+vi /etc/hosts
 ```
+
+```shell
 127.0.0.1   myserver
 ```
-![hostname](/img/2-1.png)
+![hostname](/img/2-0-3.png)
+![hostname](/img/2-0-4.png)
 
 이제 변경한 내용을 적용합니다. 아래 명령어를 입력한 뒤, 서버에 재 접속하면 설정이 적용되어 `ubuntu@myserver`등으로 변경 된 것을 확인할 수 있습니다.
 ```shell
