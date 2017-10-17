@@ -696,6 +696,8 @@ tomcat 엔진 시작 `./startup.sh`
 tomcat 재시작 `systemctl restart tomcat`
 
 
+# 7. node.js 설치하기(작성예정)
+
 # 8. Git 최신버전 설치하기
 
 ## 8-1. Git 설치
@@ -753,8 +755,95 @@ git config --list
 사용자가 등록되었으니, 이제 사용해 봅시다.
 
 ### 8-2-2. 저장소/원격 저장소의 개념
-git은 저장소(repository)와 원격 저장소(bare repository)로 나누어 생각할 수 있습니다. 따라하면서 개념을 이해해봅시다. 우선 원격 저장소를 하나 만듭니다. 원격 저장소는 새로운 우분투 유저 `git`을 생성하여 관리하도록 하겠습니다.
+git은 저장소(repository)와 원격 저장소(bare repository)로 나누어 생각할 수 있습니다. 따라하면서 개념을 이해해봅시다.이 과정은 로컬에 git을 설치해서 따라해도 됩니다. git 사용법에 익숙하신 분은 8-2-2 항목을 무시하셔도 됩니다.
 
+원하는 위치에서 디렉토리를 하나 만듭니다. 저는 `/home/ubuntu` 에서 진행하겠습니다.
+
+```shell
+cd /home/ubuntu
+mkdir git-server-bare
+cd git-server-bare
+```
+
+여기에 원격 저장소(bare repository)를 만들겠습니다. 원격 저장소는 파일의 변동사항만 저장되고, 실제 파일은 저장되지 않습니다. 여기를 Git이 관리되는 서버라고 가정합ㄴ디ㅏ.
+
+```shell
+git init --bare
+```
+
+이게 프로젝트를 관리할 저장소가 됩니다. `ls -al`로 어떤게 들어있나 구경합시다.
+
+```shell
+$ ls -al
+HEAD		config		hooks		objects
+branches	description	info		refs
+```
+
+이제 이 저장소를 clone 해봅니다. 우선 디렉토리를 빠져나오고, `git clone`으로 실제로 작업할 공간을 만듭니다. `warning: You appear to have cloned an empty repository.`라는 경고가 출력되는데 정상입니다. 아직 아무것도 commit 하지 않았기 때문입니다.
+
+```shell
+cd .. -- 밖으로 빠져나옵니다.
+git clone git-server-bare/ git-local-workspace
+```
+
+`git-local-workspace`라는 디렉토리가 생성되었습니다. 여기가 이제 실제로 작업을 할 곳이 됩니다. `clone`을 한 번 더 합시다. 이곳은 실제 서비스할 곳이라고 가정합니다.
+
+```shell
+git clone git-server-bare/ git-server-service
+```
+
+이제 해당 디렉토리에 `git-server-bare`, `git-server-service`, `git-local-workspace` 3개의 디렉토리가 생성되었습니다. 이제 로컬에서 작업한 내용이 서버에서 적용되는 과정을 실습해봅니다.
+
+```shell
+cd git-local-workspace
+ls -al
+```
+
+`ls -al`명령을 하면 `.git`이라는 폴더가 보입니다. 그냥 `ls`를 사용하면 보이지 않습니다. 여기에 파일을 추가해 봅시다.
+
+```shell
+echo a > readme.md
+```
+
+a 라는 글자가 하나 입력되어 있는 `readme.md`를 생성했습니다. 이것을 git에 등록합니다.
+
+```
+git add . -- 디렉토리의 모든 파일을 git 에 stage상태로 추가합니다. stage상태가 되면 다음 commit의 대상이 됩니다.
+git commit -m 'initial commit' -- commit을 하여 상태를 저장합니다.
+```
+
+다음과 유사한 메시지가 출력되면 성공한 것입니다.
+```shell
+[master (root-commit) e6313d3] initial commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 readme.md
+```
+
+이제 `git push`를 사용하여 원격 저장소로 변경된 정보를 전송합니다.
+```shell
+git push
+```
+
+다음과 비슷한 메시지가 출력되면 성공입니다.
+```shell
+Total 3 (delta 0), reused 0 (delta 0)
+To ~/home/ubuntu/git-server-bare/
+ * [new branch]      master -> master
+```
+
+이제 실 서비스가 된다고 가정했던 `git-server-service`로 가서 변경사항을 가져옵시다.
+```shell
+cd ../git-server-service
+ls -al  -- 여기서 파일이 없는 것을 확인하세요. `.git`밖에 없을 것입니다.
+git pull
+ls -al -- 이제 `readme.md`가 추가되었습니다.
+```
+
+이렇게 `실제 작업 디렉토리`에서 수정된 내용이 `원격 저장소`를 통해서 `서비스되는 디렉토리`로 전해지는 과정을 실습했습니다.
+
+### 8-2-3. 실제 서버에서 실습(AWS기준)
+
+ 우선 원격 저장소를 하나 만듭니다. 원격 저장소는 새로운 우분투 유저 `git`을 생성하여 관리하도록 하겠습니다.
 ```shell
 adduser git
 cd /home/git -- git 유저의 디렉토리로 이동
@@ -765,5 +854,46 @@ cd myproject
 이제 이 위치에 원격 저장소를 생성합니다.
 
 ```shell
-git —bare init
+git init --bare
 ```
+
+이 위치가 이제 앞으로 관리할 프로젝트의 저장소가 됩니다. 이제 해당 저장소에 로컬에서 작업한 내용을 push 할 수 있도록 clone 해봅니다. 로컬에서 자신이 원하는 디렉토리로 이동합니다. 보통은 `git clone user@ip:/directory` 형식으로 clone해 옵니다만, AWS EC2에서 가져오기 위해서는 `*.pem` 의 인증이 필요해서 다소 까다롭습니다.
+
+```shell
+ssh-agent $(ssh-add ~/.ssh/YourKeyPair.pem; git clone root@11.222.333.44:/home/git/myproject)
+```
+
+AWS에서 `*.pem` 인증 없이 `git clone`을 하려면 별다른 설정이 필요합니다. 이제 git 저장소가 복제되었습니다. 해당 저장소를 살펴봅시다.
+```shell
+cd myproject
+ls -al
+```
+
+.git 이라는 폴더가 생성되어 있는 것이 확인된다면, 잘 복제된 것입니다. 복제된 git 저장소는 기본적으로 `remote origin`을 복제되기 전 저장소로 인식합니다. `git remote -v`를 통해 이를 확인할 수 있습니다.
+
+```shell
+git remote -v
+```
+
+이제 빈 저장소에 첫 커밋을 해봅시다.
+```shell
+echo 'git test' > readme.md
+git add readme.md
+git commit -m 'initial commit'
+```
+
+이제 변경사항을 push해줍니다.
+```shell
+git push origin master
+```
+
+다음으로, 실제로 프로젝트를 서비스할 디렉토리에서 이를 받아봅시다. 다시 서버로 돌아갑니다. nginx, tomcat 등 자신이 설정한 서버에 정의된 디렉토리에서 시작합니다.
+```shell
+git clone /home/git/myproject public
+```
+
+이때 public은 자신이 원하는 폴더 명 입니다. 입력하지 않으면 프로젝트 폴더 명이 그대로 사용됩니다. 폴더 안에 들어가보면 로컬에서 만들었던 `readme.md` 가 들어와 있는 것을 확인할 수 있습니다.
+
+이제 로컬에서 작업한 뒤 변경 사항을 git에 등록하고(`git add ___file__name__`), 커밋한 뒤 `(git commit -m ‘___message___’`), push해주면(`git push origin master`; `git push`만 입력해도 작동합니다.) bare 저장소에 변경 사항이 저장되고, 실제로 서비스할 곳에서 `git pull`을 이용해 변경 사항을 가져올 수 있습니다.
+
+Git 에 등록되지 않고 싶은 파일이 있다면 `.gitignore` 을 이용해 컨드롤 할 수 있습니다. 여기에 Git에 포함하고 싶지 않은 파일들(프레임워크의 설정 파일 등등)을 등록한 뒤 ‘git add . ’를 입력하면 모든 변경사항을 한 번에 등록시켜 줍니다.
