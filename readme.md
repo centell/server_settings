@@ -231,7 +231,7 @@ nginx의 기본 설정만으로도 웹 서비스를 운영하는데 큰 문제�
 
 ### 3-3-1. nginx.conf
 
-```
+```shell
 #성능 이 좋은 컴퓨터를 이용할 때 성능이 향상됩니다.(기본값은 1이라서 싱글스레드로 동작합니다. auto로 사용되는 core수를 자동으로 맞춰줍니다.)
 worker_processes  auto;
 
@@ -243,7 +243,6 @@ events {
 }
 
 http {
-
     server_tokens off; #response header에 nginx 버전 표시 여부를 결정합니다. 보안을 위해 off를 해줍시다.
     charset utf8mb4; #response header 에 charset 을 부여합니다.
     client_max_body_size 20M; #웹서버에서 수신할 수 있는 최대 패킷 크기를 정의합니다. 기본값은 1MB 이며, 더 큰 파일의 업로드를 허용하려면 이 값을 늘려줘야 합니다. 원하는 값으로 바꿉니다.
