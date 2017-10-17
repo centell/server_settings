@@ -41,10 +41,9 @@ Ubuntu 16.04 LTS 환경에서의 웹 서버 세팅 방법을 다룬 한국어 �
         6-1-2. Java Home 환경 설정
     6-2. Tomcat 설치하기(8.5)
     6-3. Apache Tomcat 테스트
-
-(이하 작성 예정)
-7. node.js 설치하기
-8. Git 설치하기
+    6-4. (옵션) 톰켓의 포트 번호 변경
+7. node.js 설치하기 (작성 예정)
+8. Git 최신버전 설치하기
 ```
 
 # 1. 시작
@@ -681,7 +680,7 @@ netstat -plntu
 ![Tomcat](/img/6-5.png)
 
 
-(옵션) 톰켓의 포트 번호 변경
+## 6-4. (옵션) 톰켓의 포트 번호 변경
 톰켓 디렉토리에서 `tomcat/conf/server.xml` 에서 포트를 변경할 수 있습니다. `/8080` 으로 검색해서 기본으로 설정된 `8080` 포트를 찾아 `80`등 원하는 포트로 수정합시다.
 
 ```shell
@@ -695,3 +694,76 @@ tomcat 엔진 중지 `./shutdown.sh`
 tomcat 엔진 시작 `./startup.sh`
 
 tomcat 재시작 `systemctl restart tomcat`
+
+
+# 8. Git 최신버전 설치하기
+
+## 8-1. Git 설치
+
+최신 Git을 설치하려면 Git이 의존하고 있는 라이브러리인 autotools, curl, zlib, openssl, expat, libiconv등이 필요합니다. 예를 들어 yum을 사용하는 Fedora등의 시스템이나 apt-get이 있는 데비안 계열 시스템이면 아래 명령어 중 하나를 실행하여 필요한 패키지를 설치할 수 있습니다.
+
+```shell
+apt-get install dh-autoreconf libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev
+```
+
+문서를 다양한(doc, html, info) 형식으로 추가하려면 다음의 패키지들이 추가로 필요합니다. 이 과정은 시간이 많이 듭니다.
+```shell
+apt-get install asciidoc xmlto docbook2x
+```
+
+이제 최신 배포 파일을 받읍시다. [Kernel.org](https://www.kernel.org/pub/software/scm/git)에서 내려받을 수도 있고 GitHub에 있는 [미러](https://github.com/git/git/releases)에서도 받을 수도 있습니다. 보통 GitHub 페이지에서 최신 버전을 내려받는 것이 더 간단하지만, kernel.org에는 배포 시그너처가 있어서 내려받은 것을 검증할 수 있습니다. 아무튼 최신 버전의 다운로드 링크를 확인하고, 원하는 위치에서 `wget`을 이용해 받습니다. 저는 root(`sudo su`)의 홈 디렉터리(`~`) 에서 받겠습니다.
+
+```shell
+cd ~
+wget https://github.com/git/git/archive/v2.14.2.tar.gz
+tar -zxf v2.14.2.tar.gz
+rm v2.14.2.tar.gz -- 압출 파일을 삭제
+cd git-2.14.2
+```
+압축도 풀었고, 디렉토리로 접근했습니다. 이제 컴파일하고 설치합니다. 이때 사용되는 `configure`, `make`, `make install` 에 대해 알고 싶으면 [여기](http://www.codecoffee.com/tipsforlinux/articles/27.html)를 참고하세요.
+
+```shell
+make configure
+./configure --prefix=/usr  -- 소프트웨어를 설치할 머신에 대한 정보를 확인하고, 이에 해당하는 `Makefile`을 만든다.
+make all doc info  -- 현재 디렉토리의 `Makefile`을 실행 한다. 소스를 컴파일하고 실행 가능한 파일을 만든다.
+sudo make install install-doc install-html install-info -- 컴파일해서 생성한 실행 가능한 파일을 현재 디렉토리로 복사한다.
+```
+이 과정도 시간을 많이 필요로 합니다. 설치 되고나면 git 버전을 확인해 봅시다.
+
+```shell
+git --version
+```
+
+이제 Git을 사용하면 됩니다.
+
+## 8-2. Git의 사용
+Git은 훌륭한 버전 관리 도구입니다. 자세한 가이드 보고 싶다면 [여기](https://git-scm.com/book/ko/v2)를 확인하세요.
+유명한 툴이어서 Git을 설명하는 여러 문서가 있지만, Git을 빠르게 이해하기 위한 적확한 설명 및 예제는 다음과 같다고 생각합니다.
+
+### 8-2-1. 최소 설정
+
+Git 최초 설정으로 사용자 아이디와 이메일을 등록합니다.
+
+```shell
+git config --global user.name "Your Name"
+git config --global user.email mail@example.com
+git config --list
+```
+
+사용자가 등록되었으니, 이제 사용해 봅시다.
+
+### 8-2-2. 저장소/원격 저장소의 개념
+git은 저장소(repository)와 원격 저장소(bare repository)로 나누어 생각할 수 있습니다. 따라하면서 개념을 이해해봅시다. 우선 원격 저장소를 하나 만듭니다. 원격 저장소는 새로운 우분투 유저 `git`을 생성하여 관리하도록 하겠습니다.
+
+```shell
+adduser git
+cd /home/git -- git 유저의 디렉토리로 이동
+mkdir myproject -- git을 연습하기 위한 디렉토리를 생성
+cd myproject
+```
+
+이제 이 위치에 원격 저장소를 생성합니다.
+
+```shell
+git —bare init
+```
