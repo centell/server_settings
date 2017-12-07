@@ -402,7 +402,7 @@ collation_server = utf8mb4_unicode_ci
 
 변경사항을 적용하기 위해 재시작합니다.
 ```shell
-service mysql restar
+service mysql restart
 ```
 
 ## 5-4. nginx - php 연동
