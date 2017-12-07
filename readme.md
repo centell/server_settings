@@ -790,39 +790,38 @@ yarn -v
 ## 7-3. Express 설치
 
 Express를 설치합니다. Express에 대해 알고 싶다면 여기를 확인하세요. 옵션 -g는 Global 옵션으로 어느 path에서나 express를 사용할 수 있도록 하는 옵션입니다.
-```
+```shell
 npm install -g express
 ```
 
 Express generator를 설치합니다. 버전은 4.x이며, global 옵션으로 설치합니다.
-```
+```shell
 npm install -g express-generator@4
 ```
 
 Node monitoring을 위해 nodemon을 설치합니다.
-```
+```shell
 npm install -g nodemon
 ```
 
 이제 웹 서버를 테스트 할 수 있는 모든 환경이 갖추어졌습니다. 원하는 위치에 테스트 할 directory를 하나 만들고, 만든 directory로 이동합니다.
-```
+```shell
 mkdir node-project
 cd node-project
 ```
 
 해당 디렉토리에서 다음 명령을 입력하여 express 기본 template을 생성합니다. View engine template은 ejs(Extended JavaScript)로 합니다.
-```
+```shell
 express -e
 ```
 
 만약 이 과정에서 "/usr/bin/env: node: No such file or directory"라는 메시지 출력과 함께 에러가 날 경우 다음과 같이 심볼릭 링크를 추가합니다.
-```
+```shell
 ln -s /usr/bin/nodejs /usr/bin/node
 ```
 
 Express template이 제대로 설치되었으면 다음과 같은 항목을 확인할 수 있습니다.
-
-```
+```shell
 ls -al
 ```
 
@@ -935,7 +934,7 @@ echo a > readme.md
 
 a 라는 글자가 하나 입력되어 있는 `readme.md`를 생성했습니다. 이것을 git에 등록합니다.
 
-```
+```shell
 git add . -- 디렉토리의 모든 파일을 git 에 stage상태로 추가합니다. stage상태가 되면 다음 commit의 대상이 됩니다.
 git commit -m 'initial commit' -- commit을 하여 상태를 저장합니다.
 ```
