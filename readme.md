@@ -1,4 +1,4 @@
-Web server on Ubuntu
+Web server on Ubuntu 18.04
 ======================
 
 Ubuntu 환경에서의 웹 서버 세팅 방법을 다룬 한국어 메뉴얼입니다.
@@ -269,8 +269,8 @@ mysql> select now();
 service mysqld restart
 ```
 
-5. Node.js 설치
-5-1. 설치
+# 5. Node.js 설치
+## 5-1. 설치
 Node.js 버전 `v8.10.0` 및 npm 버전 `6.8.0`를 설치합니다.
 ```
 sudo apt install curl
